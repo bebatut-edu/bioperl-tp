@@ -40,9 +40,14 @@ du fichier de séquence
         - Ce n'est pas un script donc pas besoin de noter tout le code mais les 
         grandes lignes ou les méthodes particulières utilisées
         - Intégrer les graphiques générés
+        - Intégrer les liens vers les fichiers utiles mais aussi les sites 
 - Utilisation d'un template pour les fichiers de scripts (0.5 points)
-    - Expliquer le template des scripts Perl
-    - Expliquer le template des classes
+    - Expliquer le template des scripts Perl et des classes
+    - Importance de la documentation
+        - Vérifier la documentation avec `perldoc` 
+    - Quelques règles à respecter
+        - Faire attention à l'indentation
+        - Ne pas mettre plus de 80 caractères par ligne 
 - Utilisation d'un template `README` (0.5 points)
     - Expliquer l'importance du fichier `README` dans un projet
         - Beaucoup utiliser en informatique
