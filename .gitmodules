@@ -1,0 +1,3 @@
+[submodule "corrections"]
+	path = corrections
+	url = git@gitlab.com:bebatut/bioperl.git
