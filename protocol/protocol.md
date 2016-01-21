@@ -36,19 +36,22 @@ instructions (2 points).
 
 ## Instructions
 
-L'organisation est importante tout le temps, même en information et en bioinformatique.
+L'organisation est importante tout le temps, même en information et en 
+bioinformatique.
 En particulier dans un projet bioinformatique, il est important de bien centralisé
 à un seul endroit (dossier) tous les fichiers concernant le projet afin de garder 
 une trace. De plus, les fichiers au sein de ce dossier doivent être organiser
 de façon méthodique afin de faciliter votre travail mais aussi celui de vos 
 collaborateur. 
 
-Ainsi, tous les fichiers liés à ce projet sont rassemblés dans un dossier comprenant
+Ainsi, tous les fichiers liés à ce projet sont rassemblés dans un dossier 
+comprenant
 
 - Un dossier `data` pour toutes les données
 - Un dossier `results` pour les résultats des analyses (graphiques, fichiers
 générés, ...)
-- Un dossier `src` pour le script principal (nommé ``) et les modules Perl développés
+- Un dossier `src` pour le script principal (nommé ``) et les modules Perl 
+développés
 - Un dossier `doc` pour les notes et en particulier le compte-rendu du TP
 
 Le compte-rendu dans le cadre de ce projet correspond à un "cahier de notes", où
@@ -120,9 +123,9 @@ Pour gérer les séquences contenu dans le fichier de données, nous décidons d
 créer une classe `Sequence`, en s'inspirant de la classe `Bio::Seq`. Ainsi, 
 dans un premier temps, les objets `Sequence` ont comme propriétés:
 
-- Sa séquence à proprement parler
-- Son identifiant
-- Sa longueur
+- Sa séquence à proprement parler (nommé `SEQUENCE`)
+- Son identifiant (nommé `ID`)
+- Sa longueur (nommé `LENGTH`)
 
 Le constructeur de la classe `Sequence` prend en argument un objet `Bio::Seq` et
 extrait les informations utiles pour remplir les propriétés d'un objet `Sequence`.
@@ -139,7 +142,9 @@ Quelles sont les différentes possibilités?
 # Parcours d'un fichier de séquences
 
 Nous souhaitons maintenant parcourir le fichier avec les séquences et enregistrer
-les séquences dans des objets `Sequence`, qui seront stockés dans un tableau.
+les séquences dans des objets `Sequence`, qui seront stockés dans un objet 
+`Sequences`. Les objets de la classe `Sequences` ont deux propriétés : le 
+tableau des objets `Sequence` (nommé `SEQUENCES`) et le nombre de séquences enregistrées (nommé `SEQUENCE_NUMBER`). 
 
 Dans un premier temps, nous aimerions savoir si le nombre de séquences calculé
 précédemment correspond bien au nombre de séquences dans le fichier. Pour cela,
@@ -147,14 +152,14 @@ vous écrivez une méthode `get_real_sequence_number` qui prend en argument le c
 vers le fichier, le parcours avec un objet `Bio::SeqIO` en comptant le nombre de
 séquences (dans le script principal).
 
-Dans un second temps, nous pouvons construire des objets `Sequence` pour chaque
-séquence dans le fichier de séquences et enregistre la référence de cet objet dans
-un tableau. Ainsi, le tableau contiendra autant de cases qu'il y a de séquences. 
-Pour cela, vous écrivez une méthode `fill_sequence_tabular` (dans le script
-principal) qui prend en argument le chemin vers le fichier. Cette méthode initialise
-un tableau vide, parcours le fichier avec un objet `Bio::SeqIO` et pour chaque
-séquence, créé un objet `Sequence` et enregistre cet objet dans le tableau. La
-méthode renvoie ensuite le tableau. 
+Dans un second temps, nous aimerions construire la classe `Sequences`. Le 
+constructeur de la classe prend en argument le chemin vers un fichier de séquence.
+Il initialise un tableau vide, parcourt le fichier avec un objet `Bio::SeqIO` et 
+pour chaque séquence, créé un objet `Sequence` et enregistre cet objet dans le 
+tableau. Ainsi, le tableau contiendra autant de cases qu'il y a de séquences. 
+L'autre propriété de la classe est le nombre de séquence, qui est compté pendant
+le parcours du fichier. Vous devez construire cette classe, en pensant aussi aux 
+"getters" (pas aux "setters" ici).
 
 Le fichier est au format `fastq` et contient donc, pour chaque séquence, sa 
 séquence nucléotidique mais aussi la séquence des scores de qualité pour chaque
@@ -167,13 +172,127 @@ vous affichez l'objet avec `Dumper`. Comment récupérer la séquence des scores
 qualité? Sous quel type de données et pourquoi ce type?
 
 Pour conserver le score qualité, vous complétez la classe `Sequence` en ajoutant
-une nouvelle propriété pour le score de qualité (penser au "getter").
+une nouvelle propriété pour le score de qualité, nommé `QUALITY` (penser au 
+"getter").
 
 # Contrôle de la qualité des séquences
 
+Lorsque des données brutes sont reçues, elles ont souvent besoin d'un traitement
+de qualité, à la fois pour éliminer les petites séquences qui portent peu 
+d'information utile et aussi pour éliminer les portions des séquences où les scores
+de qualité sont faibles.
+
 ## Contrôle de la longueur des séquences
+
+La première chose à vérifier est la longueur des séquences. En particulier, 
+vérifier si toutes les séquences ont la même longueur. Pour vérifier cela, nous
+souhaitons enregistrer les longueurs des séquences dans un fichier ainsi que 
+l'identifiant de la séquence.
+
+Dans la classe `Sequences`, vous devez écrire une méthode `write_sequence_length`
+qui prend en argument le chemin vers un fichier `txt` vierge (nommé 
+`seq_length_before_quality_treatment.txt` dans le dossier `data`) et qui écrit
+ dedans, pour chaque séquence dans le tableau `SEQUENCES` (1 séquence par ligne), 
+l'identifiant et la longueur de la séquence (séparés par une tabulation `\t`). 
+
+En ouvrant le fichier généré, qu'observez-vous?
+
+Il est difficile de ressortir une tendance en étudiant directement le fichier
+généré. Une technique pour visualiser les longueurs des séquences est de 
+générer un histogramme. Pour cela, vous pouvez utiliser le script `R` 
+`plot_sequence_length.R` disponible sur 
+[bebatut-edu.github.io](http://bebatut-edu.github.io/) en l'exécutant avec la
+commande (depuis le script principal)
+
+```
+Rscript path/to/plot_sequence_length.R 
+path/to/seq_length_before_quality_treatment.txt
+path/to/results/seq_length_before_quality_treatment.pdf
+```
+
+Que pouvez-vous dire des longueurs des séquences? Que pensez-vous des séquences
+avec 50 paires de bases? Que pensez-vous qu'il faudrait faire?
 
 ## Contrôle des scores de qualité
 
-# Assignation des séquences à des séquences connues 
+Le score de qualité d'une base représente la probabilité d'erreur 
+d'identification de cette base. Lorsque cette probabilité est forte, nous pouvons
+considérer la base concernée est potentiellement mal identifier. Les scores de
+ qualité ne sont pas homogènes le long de séquences.
+
+Nous souhaitons vérifier si cela est vrai aussi sur nos séquences. Pour cela, n
+nous avons besoin d'un tableau avec une séquence par ligne (sans l'identifiant) 
+et un score de qualité de base par colonne. Ainsi, la cellule à la colonne
+$y$ et à la ligne $x$ contient le score de qualité de la séquence $x$ à la position
+$y$. 
+
+Cependant, comme observé précédemment, toutes les séquences n'ont pas la même
+longueur. Le nombre de colonne dans le fichier correspondra alors à la longueur
+maximale observée dans les séquences. Pour récupérer cette valeur, vous écrivez
+une méthode `compute_max_sequence_length` dans la classe `Sequences` qui parcoure 
+toutes les séquences et retourne la longueur maximale des séquences.
+
+Dans la classe `Sequences`, vous écrivez ensuite une méthode 
+`write_quality_scores`, qui prend en argument le chemin vers un fichier `txt`. 
+Cette méthode récupère la longueur maximale des séquences, parcoure les séquences.
+Pour chaque séquence, la longueur est récupérée et pour chaque base, le score de
+qualité est écrit dans le fichier (avec une tabulation pour séparer les colonnes).
+Les dernières colonnes (entre la longueur de la séquence et la longueur maximale
+des séquences) sont remplies avec "NA". 
+
+Depuis le script principal, vous générez un graphique en utilisant le script `R`
+`plot_quality_scores.R` (disponbile sur 
+[bebatut-edu.github.io](http://bebatut-edu.github.io/)). Que pensez-vous des 
+scores de qualité? Sont-ils homogènes le long des séquences? Quel seuil de score 
+de qualité choisisseriez-vous?
+
+Nous choisissons de fixer de conserver les bases dont le score de qualité est 
+supérieur à 25 en coupant les séquences à droite lorsque le score est inférieur
+au seuil fixé. A quel probabilité le seuil fixé correspond-il?
+
+Pour couper les séquences en fonction du seuil fixé, vous devez créer une méthode
+`eliminate_too_bad_bases` dans la classe `Sequence`. Cette méthode prend en 
+argument le seuil de score. Cette méthode créé une séquence vide, un tableau 
+vide pour les scores de qualité à conserver et initie une nouvelle longueur. Pour 
+remplir la séquence et le tableau des scores de qualité, la méthode parcoure les
+scores de qualité initiaux. Tant que le score de qualité est supérieur au seuil, 
+les bases et leur score sont ajoutés et la longueur incrémentée. Lorsqu'une base
+est inférieure au seuil, les bases suivantes ne sont pas ajoutés (la boucle est
+arrêtée). Les nouvelles séquences, scores de qualité et longueurs remplacent les
+précédentes valeurs. 
+
+Pour appliquer cette méthode à toutes les séquences, vous devez écrire une 
+méthode dans la classe `Sequences` qui parcoure les séquences en appliquant la
+méthode `eliminate_too_bad_bases` avec le seuil de score en argument.
+
+Il faut ensuite vérifier les résultats de ce traitement en générant un nouveau
+fichier avec les scores de qualité, ainsi que le graphique généré par
+`plot_quality_scores.R`. Le traitement a-t-il fonctionné?
+
+## Contrôle de la longueur des séquences (2)
+
+Après ce traitement de séquences en les coupant en fonction du score de qualité,
+les longueurs et leur distribution ont changé. Il faut regéner le graphique
+précédant après avoir généré le fichier `txt` 
+`seq_length_after_quality_treatment.txt`.
+
+Que pouvez-vous dire par rapport au graphique précédent?
+
+Nous souhaiterions garder que les séquences dont la taille est supérieur à 100 
+paires de bases. Pour cela, dans la classe `Sequences`, vous écrirez une méthode 
+`eliminate_too_small_squences` qui prend en argument la taille minimum des
+séquences à conserver. La méthode créé un tableau vide, le remplit avec les 
+séquences à conserver (car elles respectent la taille minimale des séquences) et
+ensuite remplace la propriété `SEQUENCE` par le nouveau tableau et met à jour 
+`SEQUENCE_NUMBER`.
+
+Une fois ce traitement effectué, vous pouvez vérifier que toutes les séquences
+ont une taille supérieure à 100 paires en base en générant un nouveau fichier
+`seq_length_after_length_elimination.txt` et un nouveau graphique
+`seq_length_after_length_elimination.pdf`.
+
+# Discussion
+
+Faire un schéma des classes avec les propriétés, les objets et les connections entre
+les méthodes, les objets, ...
 
