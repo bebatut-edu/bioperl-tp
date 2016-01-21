@@ -81,13 +81,99 @@ script Perl principal nommé `traitement_donnees.pl`. Cependant, comme toutes le
 étapes ne seront pas à exécuter à chaque fois, il faut penser à mettre des conditions
 de test pour les exécutions.
 
-# Récupération des données
+# Récupération et première exploration des données
+
+Les données à utiliser par chaque binôme sont disponibles sur 
+[bebatut-edu.github.io](http://bebatut-edu.github.io/). Cependant, pour garder une
+trace des données téléchargées, toutes les commandes utilisées pour récupérer et 
+transformer les données sont notées dans le script principal.
+
+Quelques pistes pour la récupération des données
+
+- Le téléchargement de données se fait avec la commande `shell` `wget <link>` 
+(`<link>` correspondant au lien récupéré en faisant `Clic droit->Copier l'adresse
+du lien` dans votre navigateur sur le lien à télécharger)
+- Les données doivent être déplacées dans le répertoire `data`
+- L'extraction des données avec l'extension `gz` se fait en utilisant la commande 
+`gunzip path/to/file`
+- L'exécution de commandes systèmes dans Perl se fait en les invoquant avec 
+`system "command"`
+
+Nous souhaiterions avoir quelques informations sur le fichier et son contenu (la 
+taille, le nombre de ligne dans le fichier, ...). Ces informations doivent être
+affichées à l'écran lors de l'exécution du script principal. Pour la taille d'un
+fichier, vous devez utiliser la classe 
+[`File::stat`](http://perldoc.perl.org/functions/stat.html) avec la méthode `size`,
+qui renvoie la taille en octets. Pour le nombre de ligne, vous écrivez une 
+méthode `get_line_number` qui ouvre le fichier et lit ligne par ligne jusqu'à la 
+fin en comptant les lignes. Vous pouvez vérifier le bon fonctionnement de votre 
+méthode en exécutant `wc -l path/to/file` depuis un terminal. 
+
+Le fichier contenant les séquences est au format `fastq`. Chaque séquence est 
+ainsi représentée sur 4 lignes. En utilisant la méthode `get_line_number`, on 
+souhaiterait obtenir le nombre de séquences dans le fichier, grâce à une méthode 
+`get_sequence_number`. 
 
 # Création d'une classe `Sequence`
 
+Pour gérer les séquences contenu dans le fichier de données, nous décidons de 
+créer une classe `Sequence`, en s'inspirant de la classe `Bio::Seq`. Ainsi, 
+dans un premier temps, les objets `Sequence` ont comme propriétés:
+
+- Sa séquence à proprement parler
+- Son identifiant
+- Sa longueur
+
+Le constructeur de la classe `Sequence` prend en argument un objet `Bio::Seq` et
+extrait les informations utiles pour remplir les propriétés d'un objet `Sequence`.
+Vous testerez ce constructeur sur la première séquence du fichier de données
+(lue grâce à  `Bio::SeqIO`), en utilisant `Dumper`.
+
+Une classe fonctionne mieux quand elle a des "getters" et des "setters", c'est-à-dire
+des méthodes permettant d'accéder aux propriétés pour les récupérer ("getters") 
+ou les modifier ("setters"). Vous ajoutez donc à votre classe `Sequence` les 
+"getters/setters" nécessaires pour chaque propriété et vous les testez dans
+le script principal. Que penser d'un "setter" pour la propriété de longueur?
+Quelles sont les différentes possibilités?
+
 # Parcours d'un fichier de séquences
 
+Nous souhaitons maintenant parcourir le fichier avec les séquences et enregistrer
+les séquences dans des objets `Sequence`, qui seront stockés dans un tableau.
+
+Dans un premier temps, nous aimerions savoir si le nombre de séquences calculé
+précédemment correspond bien au nombre de séquences dans le fichier. Pour cela,
+vous écrivez une méthode `get_real_sequence_number` qui prend en argument le chemin
+vers le fichier, le parcours avec un objet `Bio::SeqIO` en comptant le nombre de
+séquences (dans le script principal).
+
+Dans un second temps, nous pouvons construire des objets `Sequence` pour chaque
+séquence dans le fichier de séquences et enregistre la référence de cet objet dans
+un tableau. Ainsi, le tableau contiendra autant de cases qu'il y a de séquences. 
+Pour cela, vous écrivez une méthode `fill_sequence_tabular` (dans le script
+principal) qui prend en argument le chemin vers le fichier. Cette méthode initialise
+un tableau vide, parcours le fichier avec un objet `Bio::SeqIO` et pour chaque
+séquence, créé un objet `Sequence` et enregistre cet objet dans le tableau. La
+méthode renvoie ensuite le tableau. 
+
+Le fichier est au format `fastq` et contient donc, pour chaque séquence, sa 
+séquence nucléotidique mais aussi la séquence des scores de qualité pour chaque
+nucléotide. Jusqu'à présent, nous avons considéré les séquences comme des objets
+`Bio::Seq`. Or ce type d'objet ne peut contenir de score de qualité. Afin de 
+pouvoir récupérer correctement la séquence des scores de qualité, il faut déjà 
+vérifier quel type d'objet est généré pour chaque séquence par `Bio::SeqIO`. 
+Pour cela, vous récupérez la première séquence du fichier avec  `Bio::SeqIO` et
+vous affichez l'objet avec `Dumper`. Comment récupérer la séquence des scores de
+qualité? Sous quel type de données et pourquoi ce type?
+
+Pour conserver le score qualité, vous complétez la classe `Sequence` en ajoutant
+une nouvelle propriété pour le score de qualité (penser au "getter").
+
 # Contrôle de la qualité des séquences
+
+## Contrôle de la longueur des séquences
+
+## Contrôle des scores de qualité
 
 # Assignation des séquences à des séquences connues 
 
